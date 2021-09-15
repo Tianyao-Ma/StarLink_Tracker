@@ -39,7 +39,7 @@
 </p>
 
 - **Designed Real-time satellite tracking using data retrieved from [N2YO API](https://www.n2yo.com/api/)**.
-- **Built location, altitude, and duration based selector to refine satellite search**.
+- **Built location, altitude, and duration based selector to refine satellite search**.[[Refined Search]](#search)
 - **Visualized and animated satellite paths on a world map using D3 to optimize user's experience**.
 
 ## :seedling: For Furture Improvement
@@ -47,12 +47,32 @@
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 ## :spiral_notepad: Sample Code
 
-#### Retrieve real-time data from Twitch using Twitch API
+#### Retrieve real-time Satellite data from N2YO API;
 ```
-  ...
-```
+fetchSatellite = setting => {
+        const { latitude, longitude, elevation, altitude } = setting;
+        const url = `/api/${NEARBY_SATELLITE}/${latitude}/${longitude}/${elevation}/${altitude}/${STARLINK_CATEGORY}/&apiKey=${SAT_API_KEY}`;
 
-#### user registeration and authentification
+        this.setState({
+            isLoadingList: true
+        });
+
+        axios
+            .get(url)
+            .then(response => {
+                console.log(response.data);
+                this.setState({
+                    satInfo: response.data,
+                    isLoadingList: false
+                });
+            })
+            .catch(error => {
+                console.log("err in fetch satellite -> ", error);
+            });
+    };
+```
+## Search
+#### user can select satellites to track by entering location, altitude, and duration
 ```
  ...
 ```
