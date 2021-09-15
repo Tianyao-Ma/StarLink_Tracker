@@ -17,6 +17,8 @@
 
 ![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
 
+## :film_strip: Project Demo
+
 <p align="center">
 <img src="https://user-images.githubusercontent.com/78308927/132065268-4c18aed3-baf8-43d4-ba3f-baf75017688a.gif" width="800"/>
 </p>
@@ -40,10 +42,10 @@
 - **Built location, altitude, and duration based selector to refine satellite search**.
 - **Visualized and animated satellite paths on a world map using D3 to optimize user's experience**.
 
-##
-<p align='center'>
-<img src='https://img.halfrost.com/Prometheus_theme/main_screenshot.png'>
-</p>
+## :seedling: For Furture Improvement
+
+![-----------------------------------------------------](https://raw.githubusercontent.com/andreasbm/readme/master/assets/lines/rainbow.png)
+## :spiral_notepad: Sample Code
 
 #### Retrieve real-time data from Twitch using Twitch API
 ```
