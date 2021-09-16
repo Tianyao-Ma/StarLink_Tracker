@@ -40,7 +40,7 @@
 
 - **Designed Real-time satellite tracking using data retrieved from [N2YO API](https://www.n2yo.com/api/)**.
 - **Built location, altitude, and duration based selector to refine satellite search**.[[Refined Search]](#search)
-- **Visualized and animated satellite paths on a world map using D3 to optimize user's experience**.
+- **Visualized and animated satellite paths on a world map using D3 to optimize user's experience**.[[data-visualization]](#data-visualization)
 
 ## :seedling: For Furture Improvement
 
@@ -73,33 +73,207 @@ fetchSatellite = setting => {
 ```
 ## Search
 #### user can select satellites to track by entering location, altitude, and duration
-```
- ...
-```
-
-#### Searching Algorithms: 
-  ##### 1. for all users, search by top games / search by game namae
-  ```
-  ...
-  ```
-  
-  ##### 2. for registered users, search through favorite collections
-```
-..
-```
-
-#### Save, star and collect favorite items 
 
 ```
-..
+class Main extends Component {
+...
+  render() {
+        const { isLoadingList, satInfo, satList, setting } = this.state;
+        return (
+            <Row className="main">
+                <Col span={8} className="left-side">
+                    <SatSetting onShow={this.showNearbySatellite} />
+                    <SatelliteList
+                        isLoad={isLoadingList}
+                        satInfo={satInfo}
+                        onShowMap={this.showMap}
+                    />
+                </Col>
+   ...             
+  }              
+...
+class SatSetting extends Component {
+
+    render() {
+     ...
+        return (
+            <Form {...formItemLayout} className="sat-setting" onSubmit={this.showSatellite}>
+                <Form.Item label="Longitude(degrees)">
+                    {
+                        getFieldDecorator("longitude", {
+                            rules: [
+                                {
+                                    required: true,
+                                    message: "Please input your Longitude",
+                                }
+                            ],
+                        })(<InputNumber min={-180} max={180}
+                                        style={{width: "100%"}}
+                                        placeholder="Please input Longitude"
+                        />)
+                    }
+                </Form.Item>
+
+                <Form.Item label="Latitude(degrees)">
+                    {
+                        getFieldDecorator("latitude", {
+                            rules: [
+                                {
+                                    required: true,
+                                    message: "Please input your Latitude",
+                                }
+                            ],
+                        })(<InputNumber placeholder="Please input Latitude"
+                                        min={-90} max={90}
+                                        style={{width: "100%"}}
+                        />)
+                    }
+                </Form.Item>
+
+                <Form.Item label="Elevation(meters)">
+                    {
+                       ...
+                    }
+                </Form.Item>
+
+                <Form.Item label="Altitude(degrees)">
+                    {
+                       ...
+                    }
+                </Form.Item>
+
+                <Form.Item label="Duration(secs)">
+                    {
+                        ...
+                    }
+                </Form.Item>
+                <Form.Item className="show-nearby">
+                    <Button type="primary" htmlType="submit" style={{textAlign: "center"}}>
+                        Find Nearby Satellite
+                    </Button>
+                </Form.Item>
+            </Form>
+        );
+    }
+
+    showSatellite = e => {
+        e.preventDefault();
+        this.props.form.validateFields((err, values) => {
+            if (!err) {
+                this.props.onShow(values);
+            }
+        });
+    }
+}
+
 ```
+## Data Visualization 
+#### Animiated selected satellite tracks using D3.js library
 
-#### Content-based recommendation System
-  
 ```
+class WorldMap {
+  componentDidMount() {
+        axios
+            .get(WORLD_MAP_URL)
+            .then(res => {
+                const { data } = res;
+               // Topojson.feature is the function that we need to convert our TopoJSON data into GeoJSON. 
+               // So that we can feed the GeoJSON object into the path generator, which converts it into an SVG path string.
+                const land = feature(data, data.objects.countries).features;
+                this.generateMap(land);
+            })
+            .catch(e => {
+                console.log("err in fetch map data ", e.message);
+            });
+    }
+
+     componentDidUpdate(prevProps, prevState, snapshot) {
+        if (prevProps.satData !== this.props.satData) {
+            const {
+                latitude,
+                longitude,
+                elevation,
+                altitude,
+                duration
+            } = this.props.observerData;
+            const endTime = duration * 60;
+
+            this.setState({
+                isLoading: true
+            });
+
+            const urls = this.props.satData.map(sat => {
+                const { satid } = sat;
+                const url = `/api/${SATELLITE_POSITION_URL}/${satid}/${latitude}/${longitude}/${elevation}/${endTime}/&apiKey=${SAT_API_KEY}`;
+
+                return axios.get(url);
+            });
+
+            Promise.all(urls)
+                .then(res => {
+                    const arr = res.map(sat => sat.data);
+                    this.setState({
+                        isLoading: false,
+                        isDrawing: true
+                    });
+
+                    if (!prevState.isDrawing) {
+                        this.track(arr);
+                    } else {
+                        const oHint = document.getElementsByClassName("hint")[0];
+                        oHint.innerHTML =
+                            "Please wait for these satellite animation to finish before selection new ones!";
+                    }
+                })
+                .catch(e => {
+                    console.log("err in fetch satellite position -> ", e.message);
+                });
+        }
+        
+            // set intervals for auto update of satellite positions every 1 second to form a real track;
+      track = data => {
+        if (!data[0].hasOwnProperty("positions")) {
+            throw new Error("no position data");
+            return;
+        }
+
+        const len = data[0].positions.length;
+        const { duration } = this.props.observerData;
+        const { context2 } = this.map;
+
+        let now = new Date();
+
+        let i = 0;
+
+        let timer = setInterval(() => {
+            let ct = new Date();
+
+            let timePassed = i === 0 ? 0 : ct - now;
+            let time = new Date(now.getTime() + 60 * timePassed);
+
+            context2.clearRect(0, 0, width, height);
+
+            context2.font = "bold 14px sans-serif";
+            context2.fillStyle = "#333";
+            context2.textAlign = "center";
+            context2.fillText(d3TimeFormat(time), width / 2, 10);
+
+            if (i >= len) {
+                clearInterval(timer);
+                this.setState({ isDrawing: false });
+                const oHint = document.getElementsByClassName("hint")[0];
+                oHint.innerHTML = "";
+                return;
+            }
+
+            data.forEach(sat => {
+                const { info, positions } = sat;
+                this.drawSat(info, positions[i]);
+            });
+
+            i += 60;
+        }, 1000);
+    };
+}
+
 ```
-
-
-
-
-
