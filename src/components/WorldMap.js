@@ -36,6 +36,8 @@ class WorldMap1 extends Component {
             .get(WORLD_MAP_URL)
             .then(res => {
                 const { data } = res;
+               // Topojson.feature is the function that we need to convert our TopoJSON data into GeoJSON. 
+               // So that we can feed the GeoJSON object into the path generator, which converts it into an SVG path string.
                 const land = feature(data, data.objects.countries).features;
                 this.generateMap(land);
             })
