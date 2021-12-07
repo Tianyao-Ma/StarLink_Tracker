@@ -12,9 +12,10 @@
 
 ## 🎬 About the project
 <p align="justify"> 
-    It always makes a great news when Starlink Satellites train were spotted in the sky. I never get tired of watching those videos. They are just magical. Starlink is a satellite constellation development project underway by SpaceX, which is being developed to provide global broadband coverage for high-speed internet access. There are currently about 1,500 Starlink satellites in space! Many of them pass through our cities everyday without us noticing, what if we can visualize and search for satellites based on their geo-location?
-  
-   With real-time satellite data provided by N2YO, this interative visualization dashboard is cretaed using ReactJS that allows users to search and track satellites in real-time based on geo-location, and animates the result on a worldMap using D3. 
+   It always makes great news when Starlink Satellites trains were spotted in the sky. I never get tired of watching those videos. They are just magical. Starlink is a satellite constellation development project underway by SpaceX, which is being developed to provide global broadband coverage for high-speed internet access. There are currently about 1,500 Starlink satellites in space! Many of them pass through our cities every day without us noticing, what if we can visualize and search for satellites based on their geo-location?
+
+With real-time satellite data provided by N2YO, this interactive visualization dashboard is created using ReactJS that allows users to search and track satellites in real-time based on geo-location and animates the result on a world map using D3.
+
   
 </p>
 
